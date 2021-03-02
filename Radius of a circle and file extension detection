@@ -1,0 +1,15 @@
+*TASK-1*
+
+from math import pi
+r=float(input("Enter the radius:"))
+area=pi*r**2
+print("The area of the circle with radius"+str(r)+"is: "+str(area))
+
+*TASK-2*
+
+str=input("Enter the file name:")
+if (str.find(".py")):
+  print("The extension of the file is: 'python'")
+else:
+    print("The extension of the file is not 'python'")
+      
