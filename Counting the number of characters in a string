@@ -1,0 +1,10 @@
+def most_frequent(str):
+    count=dict()
+    sorted_list=list()
+    for ch in str:
+        count[ch]=count.get(ch,0)+1
+    sorted_list=sorted([(v,k) for k,v in count.items()],reverse=True)
+    for ii in sorted_list:
+        print(ii[1],'=',ii[0])
+str=input(" Please enter a string: ")
+most_frequent(str)
