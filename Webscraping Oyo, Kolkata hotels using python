@@ -1,0 +1,43 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas
+import argparse
+import connect
+
+my_url="https://www.oyorooms.com/hotels-in-kolkata/?page="
+max_page_no=3
+
+parser=argparse.ArgumentParser()
+parser.add_argument("--max_page_num", help="Enter the number of pages: ",type=int)
+parser.add_argument("--dbname", help="Enter the name of the db: ",type=str)
+args=parser.parse_args()
+info_list=[]
+connect.connect(args.dbname)
+for i in range(1,max_page_no):
+    request=requests.get(my_url+str(i))
+    content=request.content
+    soup=BeautifulSoup(content,"html.parser")
+    hotels=soup.find_all("div",{"class":"hotelCardListing"})
+    
+    for hotel in hotels:
+        hotel_info={}
+        
+        hotel_info["name"]=hotel.find("h3",{"class":"listingHotelDescription__hotelName"}).text
+       
+        hotel_info["price"]=hotel.find("div",{"class":"listingHotelDescription__priceBtn"}).text
+        hotel_info["address"]=hotel.find("div",{"class":"listingHotelDescription__hotelAddress"}).text
+        
+        try:
+             hotel_info["rating"]=hotel.find("div",{"class":"hotelRating"}).text
+        except:
+            pass
+        hotel_amenities=hotel.find("div",{"class":"amenityWrapper"}).text
+        amenities=[]
+        for amenity in hotel_amenities:
+            amenities.append(amenity.find("span",{"class":"d-body-sm d-textEllipsis"}).text.strip)
+        hotel_info["amenities"]=', '.join(amenities[:-1])   
+        info_list.append(hotel_info)
+        connect.insert_into_table(args.dbname,tuple(hotel_info.values()))
+dataFrame=pandas.DataFrame(info_list)
+dataFrame.to_csv("Oyo.csv")
+connect.get_hotel_info(args.dbname)
