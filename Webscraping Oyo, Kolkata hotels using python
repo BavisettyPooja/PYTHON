@@ -1,3 +1,5 @@
+*webscraping.py file*
+
 import requests
 from bs4 import BeautifulSoup
 import pandas
@@ -41,3 +43,25 @@ for i in range(1,max_page_no):
 dataFrame=pandas.DataFrame(info_list)
 dataFrame.to_csv("Oyo.csv")
 connect.get_hotel_info(args.dbname)
+
+*connect.py file*
+
+import sqlite3
+
+def connect(dbname):
+    conn=sqlite3.connect(dbname)
+    conn.execute("CREATE TABLE IF NOT EXISTS OYO_HOTELS(NAME TEXT,ADDRESS TEXT,PRICE INT,AMENITIES TEXT, RATING TEXT)")
+    conn.close()
+def insert_into_table(dbname,values):
+    conn=sqlite3.connect(dbname)
+    
+    conn.execute("INSERT INTO OYO_HOTELS(NAME ,ADDRESS ,PRICE ,AMENITIES , RATING) VALUES(?,?,?,?,?)")
+    conn.commit()
+    conn.close()
+def get_hotel_info(dbname):
+    conn=sqlite3.connect(dbname)
+    cur=conn.exexcute("SELECT * FROM OYO_HOTELS")
+    table_data=cur.fetchall()
+    for r in table_data:
+        print(r)
+    conn.close()    
